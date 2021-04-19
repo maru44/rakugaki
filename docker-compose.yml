@@ -1,0 +1,23 @@
+version: "3"
+services:
+  db:
+    container_name: rakugaki_db
+    image: amazon/dynamodb-local:latest
+    user: root
+    command: -jar DynamoDBLocal.jar -dbPath /var/lib/dynamo/data
+    volumes:
+      - ./tmp/db:/var/lib/dynamo/data
+    ports:
+      - 5000:5000
+
+  web:
+    container_name: rakugaki_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/go/src/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
