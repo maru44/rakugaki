@@ -1,0 +1,11 @@
+FROM alpine
+
+ARG pip_installer="https://bootstrap.pypa.io/get-pip.py"
+
+RUN apk --update add \
+    python3 \
+    curl \
+    groff
+
+RUN curl ${pip_installer} | python3 && \
+    pip3 install awscli
