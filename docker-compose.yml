@@ -6,25 +6,41 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - DYNAMO_ENDPOINT=http://dynamodb:5000/
+      - DYNAMO_ENDPOINT=rakugaki_db:8000
       - AWS_ACCESS_KEY_ID=aaa
       - AWS_SECRET_ACCESS_KEY=aaa
       - AWS_SESSION_TOKEN=aaa
     volumes:
       - .:/go/src/app
     ports:
-      - 8000:8000
-    depends_on:
-      - db
+      - 8080:8080
+    networks:
+      - network
 
   db:
     container_name: rakugaki_db
-    build:
-      context: .
-      dockerfile: Dockerfile_dynamo
+    image: amazon/dynamodb-local:latest
     user: root
-    command: -jar DynamoDBLocal.jar -dbPath /var/lib/dynamo/data
+    command: -jar DynamoDBLocal.jar sharedDb -dbPath /var/lib/dynamo/data -optimizeDbBeforeStartup
     volumes:
       - ./tmp/db:/var/lib/dynamo/data
     ports:
-      - 5000:5000
+      - 8000:8000
+    networks:
+      - network
+
+  db-admin:
+    container_name: rakugaki_admin
+    image: aaronshaf/dynamodb-admin:latest
+    environment:
+      - DYNAMO_ENDPOINT=rakugaki_db:8000
+    ports:
+      - 8001:8001
+    depends_on:
+      - db
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
