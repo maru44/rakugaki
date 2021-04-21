@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -49,44 +48,41 @@ func main() {
 	*/
 
 	// create table
+	/*
+		tableName := "Contents"
+		createParams := &dynamodb.CreateTableInput{
+			AttributeDefinitions: []*dynamodb.AttributeDefinition{
+				{
+					AttributeName: aws.String("Year"),
+					AttributeType: aws.String("S"),
+				},
+				{
+					AttributeName: aws.String("Person"),
+					AttributeType: aws.String("S"),
+				},
+			},
+			KeySchema: []*dynamodb.KeySchemaElement{
+				{
+					AttributeName: aws.String("Person"),
+					KeyType:       aws.String("HASH"),
+				},
+				{
+					AttributeName: aws.String("Year"),
+					KeyType:       aws.String("RANGE"),
+				},
+			},
+			ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+				ReadCapacityUnits:  aws.Int64(10),
+				WriteCapacityUnits: aws.Int64(10),
+			},
+			TableName: aws.String(tableName),
+		}
 
-	tableName := "Contents"
-	createParams := &dynamodb.CreateTableInput{
-		AttributeDefinitions: []*dynamodb.AttributeDefinition{
-			{
-				AttributeName: aws.String("Year"),
-				AttributeType: aws.String("S"),
-			},
-			{
-				AttributeName: aws.String("Person"),
-				AttributeType: aws.String("S"),
-			},
-			{
-				AttributeName: aws.String("Content"),
-				AttributeType: aws.String("S"),
-			},
-		},
-		KeySchema: []*dynamodb.KeySchemaElement{
-			{
-				AttributeName: aws.String("Person"),
-				KeyType:       aws.String("HASH"),
-			},
-			{
-				AttributeName: aws.String("Year"),
-				KeyType:       aws.String("RANGE"),
-			},
-		},
-		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(10),
-			WriteCapacityUnits: aws.Int64(10),
-		},
-		TableName: aws.String(tableName),
-	}
-
-	_, err := db.CreateTable(createParams)
-	if err != nil {
-		log.Fatalf("Error: %s", err)
-	}
+		_, err := db.CreateTable(createParams)
+		if err != nil {
+			log.Fatalf("Error: %s", err)
+		}
+	*/
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, %v", db)
