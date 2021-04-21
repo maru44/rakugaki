@@ -33,7 +33,7 @@ services:
     container_name: rakugaki_admin
     image: aaronshaf/dynamodb-admin:latest
     environment:
-      - DYNAMO_ENDPOINT=rakugaki_db:8000
+      - DYNAMO_ENDPOINT=http://rakugaki_db:8000
     ports:
       - 8001:8001
     depends_on:

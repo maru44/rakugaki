@@ -2,44 +2,24 @@ package main
 
 import (
 	"fmt"
+	"localhost/rakugaki/utils"
 	"net/http"
-	"os"
-
 	// "encoding/json"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	//"github.com/aws/aws-lambda-go/lambda"
 )
 
-type Comment struct {
+type Contents struct {
 	Person  string `dynamodbav:"Person,hash"`
 	Year    string `dynamodbav:"Year,range"`
 	Content string `dynamodbav:"Content"`
 }
 
 func main() {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
-
-	db := dynamodb.New(sess, &aws.Config{
-		Region:   aws.String("ap-northeast-1"),
-		Endpoint: aws.String(os.Getenv("DYNAMO_ENDPOINT")),
-		Credentials: credentials.NewStaticCredentials(
-			os.Getenv("AWS_ACCESS_KEY_ID"),
-			os.Getenv("AWS_SECRET_ACCESS_KEY"),
-			os.Getenv("AWS_SESSION_TOKEN"),
-		),
-	})
 
 	// delete table
-
 	/*
 		delParams := &dynamodb.DeleteTableInput{
-			TableName: aws.String("Comments"),
+			TableName: aws.String("Contents"),
 		}
 		resp, err := db.DeleteTable(delParams)
 		if err != nil {
@@ -84,9 +64,43 @@ func main() {
 		}
 	*/
 
+	// table list
+	/*
+		tableListInput := &dynamodb.ListTablesInput{}
+		tableList, err := db.ListTables(tableListInput)
+		if err != nil {
+			log.Fatalf("Error: %s", err)
+		}
+	*/
+
+	tableKey := map[string]string{
+		"pKeyName": "Person",
+		"pkeyType": "S",
+		"sKeyName": "Year",
+		"sKeyType": "S",
+	}
+
+	tableKeyL := []string{
+		"Person",
+		"S",
+		"Year",
+		"S",
+	}
+
+	utils.CreateTable("Contents", tableKeyL...)
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %v", db)
+		fmt.Fprintf(w, "Hello, %v", "resp")
 	})
 
 	http.ListenAndServe(":8080", nil)
+}
+
+func isExist(el string, list []string) bool {
+	for _, listEl := range list {
+		if listEl == el {
+			return true
+		}
+	}
+	return false
 }
