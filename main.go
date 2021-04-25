@@ -2,19 +2,30 @@ package main
 
 import (
 	"fmt"
+	"localhost/rakugaki/routes"
 	"localhost/rakugaki/utils"
+
 	"net/http"
 	// "encoding/json"
 	//"github.com/aws/aws-lambda-go/lambda"
 )
 
-type Contents struct {
-	Person  string `dynamodbav:"Person,hash"`
-	Year    string `dynamodbav:"Year,range"`
-	Content string `dynamodbav:"Content"`
-}
-
 func main() {
+	/*
+		sess := session.Must(session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable,
+		}))
+
+		db := dynamodb.New(sess, &aws.Config{
+			Region:   aws.String("ap-northeast-1"),
+			Endpoint: aws.String(os.Getenv("DYNAMO_ENDPOINT")),
+			Credentials: credentials.NewStaticCredentials(
+				os.Getenv("AWS_ACCESS_KEY_ID"),
+				os.Getenv("AWS_SECRET_ACCESS_KEY"),
+				os.Getenv("AWS_SESSION_TOKEN"),
+			),
+		})
+	*/
 
 	// delete table
 	/*
@@ -64,35 +75,26 @@ func main() {
 		}
 	*/
 
-	// table list
-	/*
-		tableListInput := &dynamodb.ListTablesInput{}
-		tableList, err := db.ListTables(tableListInput)
-		if err != nil {
-			log.Fatalf("Error: %s", err)
+	http.HandleFunc("/create/table/quot", func(w http.ResponseWriter, r *http.Request) {
+		quotes := utils.KeyDict{
+			PKeyName: "Category",
+			PKeyType: "S",
+			SKeyName: "Year",
+			SKeyType: "S",
 		}
-	*/
+		utils.CreateTable("Quotations", quotes)
 
-	tableKey := map[string]string{
-		"pKeyName": "Person",
-		"pkeyType": "S",
-		"sKeyName": "Year",
-		"sKeyType": "S",
-	}
-
-	tableKeyL := []string{
-		"Person",
-		"S",
-		"Year",
-		"S",
-	}
-
-	utils.CreateTable("Contents", tableKeyL...)
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %v", "resp")
+		fmt.Fprintf(w, "aaa %v", "bbb")
 	})
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, %v", "home")
+	})
+
+	/***********   DB  ************/
+	http.HandleFunc("/db/list", routes.Handle(utils.TableList))
+
+	/***********  Serve  **********/
 	http.ListenAndServe(":8080", nil)
 }
 
