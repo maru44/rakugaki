@@ -6,6 +6,12 @@ import (
 	"net/http"
 )
 
+type TQuot struct {
+	Category string `json:"Category"`
+	Content  string `json:"Content"`
+	Year     string `json:"Year"`
+}
+
 func SamplePost(w http.ResponseWriter, r *http.Request) error {
 	var quatation TQuot
 	json.NewDecoder(r.Body).Decode(&quatation)

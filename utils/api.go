@@ -25,7 +25,7 @@ func IsProductionEnv() bool {
 	return true
 }
 
-func _SetDefaultResponseHeader(w http.ResponseWriter) bool {
+func SetDefaultResponseHeader(w http.ResponseWriter) bool {
 	protocol := "http"
 	host := "localhost:3000"
 	if IsProductionEnv() {
@@ -46,7 +46,7 @@ func (json_ TypeJsonResponse) ResponseJsonWrite(w http.ResponseWriter) bool {
 		return false
 	}
 
-	_SetDefaultResponseHeader(w)
+	SetDefaultResponseHeader(w)
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 	return true
