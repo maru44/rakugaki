@@ -16,3 +16,6 @@
 
 *.sum
 .env
+
+**/tmp
+tmp/**
