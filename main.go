@@ -94,8 +94,14 @@ func main() {
 	/***********   DB  ************/
 	http.HandleFunc("/db/list", routes.Handle(utils.TableList))
 
+	/**********  quatation  *********/
+	http.HandleFunc("/quotation/post/sample", routes.Handle(utils.SamplePost))
+	http.HandleFunc("/quotation/post", routes.Handle(utils.PostQuot))
+	http.HandleFunc("/quotation/", routes.Handle(utils.ListQuot))
+
 	/***********  Serve  **********/
 	http.ListenAndServe(":8080", nil)
+
 }
 
 func isExist(el string, list []string) bool {

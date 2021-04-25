@@ -47,6 +47,7 @@ func (json_ TypeJsonResponse) ResponseJsonWrite(w http.ResponseWriter) bool {
 	}
 
 	_SetDefaultResponseHeader(w)
+	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 	return true
 }
