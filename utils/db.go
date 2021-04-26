@@ -66,20 +66,24 @@ func CreateTable(tName string, key KeyDict) {
 				AttributeName: aws.String(key.PKeyName),
 				AttributeType: aws.String(key.PKeyType),
 			},
-			{
-				AttributeName: aws.String(key.SKeyName),
-				AttributeType: aws.String(key.SKeyType),
-			},
+			/*
+				{
+					AttributeName: aws.String(key.SKeyName),
+					AttributeType: aws.String(key.SKeyType),
+				},
+			*/
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
 				AttributeName: aws.String(key.PKeyName),
 				KeyType:       aws.String("HASH"),
 			},
-			{
-				AttributeName: aws.String(key.SKeyName),
-				KeyType:       aws.String("RANGE"),
-			},
+			/*
+				{
+					AttributeName: aws.String(key.SKeyName),
+					KeyType:       aws.String("RANGE"),
+				},
+			*/
 		},
 		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(10),

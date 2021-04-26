@@ -129,25 +129,51 @@ func DetailCounter(cat string) int {
 	res, err := db.GetItem(input)
 	if err != nil {
 		fmt.Println(err.Error())
-		return 9
+		return -1
 	}
 	count := TCounter{}
 	err = dynamodbattribute.UnmarshalMap(res.Item, &count)
 	if err != nil {
 		fmt.Println(err.Error())
-		return 9
+		return -1
 	}
 
 	return count.Count
 }
 
 func UpdateCounter(cat string, count int) bool {
+
+	db := utils.AccessDB()
+	// countは予約語 expressionattributenames で回避
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":ncount": {
-				N: aws.String(strconv.Itoa(count)),
+			/*
+				":ncount": {
+					N: aws.String(strconv.Itoa(count)),
+				},
+			*/
+			":increment": {
+				N: aws.String(strconv.Itoa(1)),
 			},
 		},
+		ExpressionAttributeNames: map[string]*string{
+			"#ct": aws.String("Count"),
+		},
 		TableName: aws.String("Counters"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"Category": {
+				S: aws.String(cat),
+			},
+		},
+		//ReturnValues:     aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String("add #ct :increment"),
 	}
+
+	_, err := db.UpdateItem(input)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+
+	return true
 }

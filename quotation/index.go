@@ -53,8 +53,13 @@ func PostQuot(w http.ResponseWriter, r *http.Request) error {
 	//now := time.Now().Format("2006-01-02 15:04:05")
 	cat := posted.Category
 	nowCount := DetailCounter(cat)
+	counterUpdated := UpdateCounter(cat, nowCount)
 	nowCount++
 	posted.Number = nowCount
+
+	if counterUpdated == false {
+		return nil
+	}
 
 	quot, err := dynamodbattribute.MarshalMap(posted)
 

@@ -39,6 +39,11 @@ func main() {
 	*/
 
 	/*
+		type TCounter struct {
+			Category string
+			Count    int
+		}
+
 		db := utils.AccessDB()
 		item := TCounter{
 			Category: "good",
