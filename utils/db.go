@@ -63,12 +63,12 @@ func CreateTable(tName string, key KeyDict) {
 	createParams := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
-				AttributeName: aws.String(key.SKeyName),
-				AttributeType: aws.String(key.SKeyType),
-			},
-			{
 				AttributeName: aws.String(key.PKeyName),
 				AttributeType: aws.String(key.PKeyType),
+			},
+			{
+				AttributeName: aws.String(key.SKeyName),
+				AttributeType: aws.String(key.SKeyType),
 			},
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{

@@ -30,11 +30,6 @@ type TQuot struct {
 	Number   int    `json:"Number"`
 }
 
-type TCounter struct {
-	Category string `json:"Category"`
-	Count    int    `json:"Count"`
-}
-
 func (quot TQuotInputResponse) ResponseWrite(w http.ResponseWriter) bool {
 	res, err := json.Marshal(quot)
 
@@ -56,7 +51,10 @@ func PostQuot(w http.ResponseWriter, r *http.Request) error {
 	json.NewDecoder(r.Body).Decode(&posted)
 
 	//now := time.Now().Format("2006-01-02 15:04:05")
-	posted.Number = 1
+	cat := posted.Category
+	nowCount := DetailCounter(cat)
+	nowCount++
+	posted.Number = nowCount
 
 	quot, err := dynamodbattribute.MarshalMap(posted)
 
@@ -102,7 +100,6 @@ func ListQuot(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	result.Data = quots
-	fmt.Fprintf(w, "%v %v", result.Status, result.Data)
 	result.ResponseWrite(w)
 	return nil
 }
