@@ -82,7 +82,8 @@ func main() {
 	http.HandleFunc("/quotation/counter/", routes.Handle(quotation.ListCounter))
 	http.HandleFunc("/quotation/counter/good", routes.Handle(quotation.DetailCounterRes))
 	http.HandleFunc("/quotation/post", routes.Handle(quotation.PostQuot))
-	http.HandleFunc("/quotation/", routes.Handle(quotation.ListQuot))
+	// http.HandleFunc("/quotation/det/", routes.Handle(quotation.DetailQuotation))
+	http.HandleFunc("/quotation/", routes.Handle(quotation.GetQuot))
 
 	/***********  Serve  **********/
 	http.ListenAndServe(":8080", nil)

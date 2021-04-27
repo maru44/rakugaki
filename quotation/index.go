@@ -4,31 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"localhost/rakugaki/utils"
-	"log"
 	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
-
-/**************  validation  **************/
-type TValid struct {
-	Status int    `json:"status"`
-	Valid  string `json:"valid"`
-}
-
-/**************  quotation post *************/
-type TQuotInputResponse struct {
-	Status int     `json:"Status"`
-	Data   []TQuot `json:"Data"`
-}
-
-type TQuot struct {
-	Category string `json:"Category"`
-	Content  string `json:"Content"`
-	Number   int    `json:"Number"`
-}
 
 func (quot TQuotInputResponse) ResponseWrite(w http.ResponseWriter) bool {
 	res, err := json.Marshal(quot)
@@ -83,28 +64,55 @@ func PostQuot(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func ListQuot(w http.ResponseWriter, r *http.Request) error {
+// list or retreive
+func GetQuot(w http.ResponseWriter, r *http.Request) error {
 	result := TQuotInputResponse{Status: 200}
 
-	db := utils.AccessDB()
-	tableName := "Quotations"
-	input := &dynamodb.ScanInput{
-		TableName: aws.String(tableName),
-	}
-
-	scanOut, err := db.Scan(input)
-	if err != nil {
-		log.Fatalf("Query API call failed: %s", err)
-	}
+	query := r.URL.Query()
+	cat := query.Get("c")
+	num := query.Get("n")
 
 	var quots []TQuot
-	for _, n := range scanOut.Items {
-		var quotTemp TQuot
-		_ = dynamodbattribute.UnmarshalMap(n, &quotTemp)
-		quots = append(quots, quotTemp)
+	if cat != "" && num != "" {
+		quots = getDetailQuot(cat, num)
+	} else {
+		quots = getListQuot()
 	}
 
 	result.Data = quots
 	result.ResponseWrite(w)
+	return nil
+}
+
+/*************  以下不要  **************/
+
+func (quot TQuotInputDetResponse) ResponseWrite(w http.ResponseWriter) bool {
+	res, err := json.Marshal(quot)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return false
+	}
+
+	utils.SetDefaultResponseHeader(w)
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+	return true
+}
+
+// only detail
+func DetailQuotation(w http.ResponseWriter, r *http.Request) error {
+	result := TQuotInputDetResponse{Status: 200}
+
+	query := r.URL.Query()
+	cat := query.Get("c")
+	num := query.Get("n")
+
+	quots := getDetailQuot(cat, num)
+	quot := quots[0]
+
+	result.Data = quot
+	result.ResponseWrite(w)
+
 	return nil
 }
