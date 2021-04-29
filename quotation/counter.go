@@ -87,29 +87,8 @@ func ListCounter(w http.ResponseWriter, r *http.Request) error {
 func DetailCounterRes(w http.ResponseWriter, r *http.Request) error {
 	result := TCounterInputResponse{Status: 200}
 
-	db := utils.AccessDB()
-	input := &dynamodb.GetItemInput{
-		TableName: aws.String("Counters"),
-		Key: map[string]*dynamodb.AttributeValue{
-			"Category": {
-				S: aws.String("good"),
-			},
-		},
-	}
-
-	res, err := db.GetItem(input)
-	if err != nil {
-		fmt.Fprintf(w, "Hello, %v", err)
-		return nil
-	}
-	count := TCounter{}
-	err = dynamodbattribute.UnmarshalMap(res.Item, &count)
-	if err != nil {
-		fmt.Println(err.Error())
-		return nil
-	}
-
-	result.Data = count.Count
+	count := DetailCounter("good")
+	result.Data = count
 
 	result.ResponseWrite(w)
 	return nil
@@ -141,11 +120,18 @@ func DetailCounter(cat string) int {
 	return count.Count
 }
 
+// counterのnumberを上げる
 func UpdateCounter(cat string, count int) bool {
 
 	db := utils.AccessDB()
 	// countは予約語 expressionattributenames で回避
 	input := &dynamodb.UpdateItemInput{
+		TableName: aws.String("Counters"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"Category": {
+				S: aws.String(cat),
+			},
+		},
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			/*
 				":ncount": {
@@ -158,12 +144,6 @@ func UpdateCounter(cat string, count int) bool {
 		},
 		ExpressionAttributeNames: map[string]*string{
 			"#ct": aws.String("Count"),
-		},
-		TableName: aws.String("Counters"),
-		Key: map[string]*dynamodb.AttributeValue{
-			"Category": {
-				S: aws.String(cat),
-			},
 		},
 		//ReturnValues:     aws.String("UPDATED_NEW"),
 		UpdateExpression: aws.String("add #ct :increment"),

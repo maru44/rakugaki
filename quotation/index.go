@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"localhost/rakugaki/utils"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -30,6 +32,12 @@ func PostQuot(w http.ResponseWriter, r *http.Request) error {
 
 	var posted TQuot
 	json.NewDecoder(r.Body).Decode(&posted)
+	fmt.Print(posted)
+
+	// generate slug
+	rand.Seed(time.Now().UnixNano())
+	slug := utils.GenRandSlug(12)
+	posted.Slug = slug
 
 	//now := time.Now().Format("2006-01-02 15:04:05")
 	cat := posted.Category
@@ -69,16 +77,34 @@ func GetQuot(w http.ResponseWriter, r *http.Request) error {
 	result := TQuotInputResponse{Status: 200}
 
 	query := r.URL.Query()
-	cat := query.Get("c")
-	num := query.Get("n")
+	/*
+		cat := query.Get("c")
+		num := query.Get("n")
+	*/
+	slug := query.Get("s")
 
 	var quots []TQuot
-	if cat != "" && num != "" {
-		quots = getDetailQuot(cat, num)
-	} else {
-		quots = getListQuot()
+	/*
+		if cat != "" && num != "" {
+			quots = getDetailQuot(cat, num)
+		} else {
+			quots = getListQuot()
+		}
+	*/
+	quots = getListQuot()
+	if slug != "" {
+		quots = getDetailQuot(slug)
 	}
 
+	result.Data = quots
+	result.ResponseWrite(w)
+	return nil
+}
+
+func GetRandomQuot(w http.ResponseWriter, r *http.Request) error {
+	result := TQuotInputResponse{Status: 200}
+
+	quots := randomQuotation("good")
 	result.Data = quots
 	result.ResponseWrite(w)
 	return nil
@@ -101,6 +127,7 @@ func (quot TQuotInputDetResponse) ResponseWrite(w http.ResponseWriter) bool {
 }
 
 // only detail
+/*
 func DetailQuotation(w http.ResponseWriter, r *http.Request) error {
 	result := TQuotInputDetResponse{Status: 200}
 
@@ -116,3 +143,4 @@ func DetailQuotation(w http.ResponseWriter, r *http.Request) error {
 
 	return nil
 }
+*/

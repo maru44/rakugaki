@@ -2,6 +2,7 @@ package utils
 
 import (
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -32,10 +33,15 @@ type ListJson struct {
 }
 
 type KeyDict struct {
-	PKeyName string
-	PKeyType string
-	SKeyName string
-	SKeyType string
+	PKeyName   string
+	PKeyType   string
+	SKeyName   string
+	SKeyType   string
+	GSIName    string
+	GSPKeyName string
+	GSPKeyType string
+	GSSKeyName string
+	GSSKeyType string
 }
 
 func AccessDB() *dynamodb.DynamoDB {
@@ -60,6 +66,7 @@ func CreateTable(tName string, key KeyDict) {
 	db := AccessDB()
 
 	tableName := tName
+	// projection type "ALL" "INCLUDE"
 	createParams := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
@@ -72,6 +79,14 @@ func CreateTable(tName string, key KeyDict) {
 					AttributeType: aws.String(key.SKeyType),
 				},
 			*/
+			{
+				AttributeName: aws.String(key.GSPKeyName),
+				AttributeType: aws.String(key.GSPKeyType),
+			},
+			{
+				AttributeName: aws.String(key.GSSKeyName),
+				AttributeType: aws.String(key.GSSKeyType),
+			},
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
@@ -84,6 +99,58 @@ func CreateTable(tName string, key KeyDict) {
 					KeyType:       aws.String("RANGE"),
 				},
 			*/
+		},
+		GlobalSecondaryIndexes: []*dynamodb.GlobalSecondaryIndex{
+			{
+				IndexName: aws.String(key.GSIName),
+				KeySchema: []*dynamodb.KeySchemaElement{
+					{
+						AttributeName: aws.String(key.GSPKeyName),
+						KeyType:       aws.String("HASH"),
+					},
+					{
+						AttributeName: aws.String(key.GSSKeyName),
+						KeyType:       aws.String("RANGE"),
+					},
+				},
+				Projection: &dynamodb.Projection{
+					ProjectionType: aws.String("KEYS_ONLY"),
+				},
+				ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+					ReadCapacityUnits:  aws.Int64(10),
+					WriteCapacityUnits: aws.Int64(10),
+				},
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+		TableName: aws.String(tableName),
+	}
+
+	_, err := db.CreateTable(createParams)
+	if err != nil {
+		log.Fatalf("Error: %s", err)
+	}
+}
+
+func CreateCountTable(tName string, key KeyDict) {
+	db := AccessDB()
+
+	tableName := tName
+	createParams := &dynamodb.CreateTableInput{
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String(key.PKeyName),
+				AttributeType: aws.String(key.PKeyType),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String(key.PKeyName),
+				KeyType:       aws.String("HASH"),
+			},
 		},
 		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
 			ReadCapacityUnits:  aws.Int64(10),
@@ -134,4 +201,14 @@ func TableList(w http.ResponseWriter, r *http.Request) error {
 	result.Data = tables
 	result.ResponseJsonWrite(w)
 	return nil
+}
+
+const slugLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
+
+func GenRandSlug(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = slugLetters[rand.Intn(len(slugLetters))]
+	}
+	return string(b)
 }
