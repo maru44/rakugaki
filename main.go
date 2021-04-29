@@ -28,6 +28,7 @@ func main() {
 	http.HandleFunc("/db/make/quotation/", routes.Handle(utils.MakeQuotationTable))
 	http.HandleFunc("/db/make/counter/", routes.Handle(utils.MakeCounterTable))
 
+	http.HandleFunc("/quotation/delete/", routes.Handle(quotation.DeleteQuotController))
 	/**********  quatation  *********/
 	http.HandleFunc("/quotation/counter/", routes.Handle(quotation.ListCounter))
 	http.HandleFunc("/quotation/counter/good", routes.Handle(quotation.DetailCounterRes))

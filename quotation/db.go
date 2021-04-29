@@ -180,3 +180,22 @@ func randomQuotation(cat string) []TQuot {
 
 	return ret
 }
+
+func deleteQuot(slug string) bool {
+	db := utils.AccessDB()
+	input := &dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"Slug": {
+				S: aws.String(slug),
+			},
+		},
+		TableName: aws.String("Quotations"),
+	}
+	_, err := db.DeleteItem(input)
+	if err != nil {
+		log.Fatalf("Got error calling DeleteItem: %s", err)
+		return false
+	}
+
+	return true
+}

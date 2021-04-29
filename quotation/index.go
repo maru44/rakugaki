@@ -28,6 +28,7 @@ func (quot TQuotInputResponse) ResponseWrite(w http.ResponseWriter) bool {
 }
 
 func PostQuot(w http.ResponseWriter, r *http.Request) error {
+	utils.SetDefaultResponseHeader(w)
 	result := TQuotInputResponse{Status: 200}
 
 	var posted TQuot
@@ -109,6 +110,26 @@ func GetRandomQuot(w http.ResponseWriter, r *http.Request) error {
 	quots := randomQuotation(cat)
 	result.Data = quots
 	result.ResponseWrite(w)
+	return nil
+}
+
+func DeleteQuotController(w http.ResponseWriter, r *http.Request) error {
+	utils.SetDefaultResponseHeader(w)
+	query := r.URL.Query()
+	slug := query.Get("s")
+
+	deleteQuot(slug)
+
+	result := utils.TypeJsonResponse{Status: 200}
+
+	var datas []utils.BaseJson
+	var data utils.BaseJson
+	data.Key = "slug"
+	data.Value = slug
+	datas = append(datas, data)
+
+	result.Data = datas
+	result.ResponseJsonWrite(w)
 	return nil
 }
 
