@@ -13,69 +13,6 @@ import (
 
 func main() {
 
-	// delete table
-	// utils.DeleteTable("Quotations")
-	// utils.DeleteTable("Counters")
-
-	// create table
-	/*
-		quots := utils.KeyDict{
-			PKeyName:   "Category",
-			PKeyType:   "S",
-			SKeyName:   "Number",
-			SKeyType:   "N",
-			GSIName:    "Slug",
-			GSPKeyName: "Slugkey",
-			GSPKeyType: "S",
-		}
-		utils.CreateTable("Quotations", quots)
-	*/
-
-	/*
-		quots := utils.KeyDict{
-			PKeyName:   "Slug",
-			PKeyType:   "S",
-			GSIName:    "Cat-Num-Index",
-			GSPKeyName: "Category",
-			GSPKeyType: "S",
-			GSSKeyName: "Number",
-			GSSKeyType: "N",
-		}
-		utils.CreateTable("Quotations", quots)
-	*/
-
-	/*
-		counts := utils.KeyDict{
-			PKeyName: "Category",
-			PKeyType: "S",
-		}
-		utils.CreateCountTable("Counters", counts)
-
-		type TCounter struct {
-			Category string
-			Count    int
-		}
-		db := utils.AccessDB()
-		item := TCounter{
-			Category: "good",
-			Count:    0,
-		}
-		av, err := dynamodbattribute.MarshalMap(item)
-		if err != nil {
-			log.Fatalf("Got error marshalling new movie item: %s", err)
-		}
-
-		input := &dynamodb.PutItemInput{
-			TableName: aws.String("Counters"),
-			Item:      av,
-		}
-
-		_, err = db.PutItem(input)
-		if err != nil {
-			fmt.Printf(err.Error())
-		}
-	*/
-
 	/**********************************
 	*                                 *
 	*             Routes              *

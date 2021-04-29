@@ -33,8 +33,9 @@ type TQuotInputDetResponse struct {
 type TQuot struct {
 	Slug     string `json:"Slug"`
 	Category string `json:"Category"`
-	Content  string `json:"Content"`
 	Number   int    `json:"Number"`
+	Content  string `json:"Content"`
+	From     string `json:"From"`
 }
 
 /**************  functions  ******************/

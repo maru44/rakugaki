@@ -103,8 +103,10 @@ func GetQuot(w http.ResponseWriter, r *http.Request) error {
 
 func GetRandomQuot(w http.ResponseWriter, r *http.Request) error {
 	result := TQuotInputResponse{Status: 200}
+	query := r.URL.Query()
+	cat := query.Get("c")
 
-	quots := randomQuotation("good")
+	quots := randomQuotation(cat)
 	result.Data = quots
 	result.ResponseWrite(w)
 	return nil
