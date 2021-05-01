@@ -132,38 +132,3 @@ func DeleteQuotController(w http.ResponseWriter, r *http.Request) error {
 	result.ResponseJsonWrite(w)
 	return nil
 }
-
-/*************  以下不要  **************/
-
-func (quot TQuotInputDetResponse) ResponseWrite(w http.ResponseWriter) bool {
-	res, err := json.Marshal(quot)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return false
-	}
-
-	utils.SetDefaultResponseHeader(w)
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
-	return true
-}
-
-// only detail
-/*
-func DetailQuotation(w http.ResponseWriter, r *http.Request) error {
-	result := TQuotInputDetResponse{Status: 200}
-
-	query := r.URL.Query()
-	cat := query.Get("c")
-	num := query.Get("n")
-
-	quots := getDetailQuot(cat, num)
-	quot := quots[0]
-
-	result.Data = quot
-	result.ResponseWrite(w)
-
-	return nil
-}
-*/
